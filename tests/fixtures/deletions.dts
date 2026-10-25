@@ -1,0 +1,39 @@
+/dts-v1/;
+
+/ {
+    target: device {
+        keep = <1>;
+        replace = <1>;
+        remove = <1>;
+
+        remove-child {
+            value = <1>;
+        };
+
+        keep-child {
+            old = <1>;
+        };
+    };
+};
+
+&target {
+    /delete-property/ remove;
+    replace = <2>;
+    /delete-property/ absent;
+    middle = <2>;
+
+    /delete-node/ remove-child;
+
+    keep-child {
+        /delete-property/ old;
+        new = <2>;
+    };
+};
+
+&target {
+    absent = <3>;
+
+    remove-child {
+        restored = <3>;
+    };
+};

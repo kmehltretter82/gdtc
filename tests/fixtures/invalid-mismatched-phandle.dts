@@ -1,0 +1,8 @@
+/dts-v1/;
+
+/ {
+    target {
+        phandle = <1>;
+        linux,phandle = <2>;
+    };
+};

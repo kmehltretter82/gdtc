@@ -1,0 +1,13 @@
+/dts-v1/;
+
+/* A comment before the root. */
+/ {
+    // A line comment.
+    first-property = "first";
+    suffix-property = "exercises string table suffix reuse";
+    property = "property is a suffix of suffix-property";
+
+    child { /* inline block comment */
+        value = <42>;
+    };
+};

@@ -1,0 +1,7 @@
+/dts-v1/;
+
+/ {
+    target {
+        phandle = <0>;
+    };
+};

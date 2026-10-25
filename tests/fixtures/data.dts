@@ -1,0 +1,18 @@
+/dts-v1/;
+
+/ {
+    model = "Goose test tree";
+    compatible = "example,gdtc", "example,board";
+    empty;
+    bytes = [00 01 7f 80 fe ff];
+    escaped = "line\nquote\"slash\\hex\x21octal\041";
+    controls = "\a\v";
+    cells = <0 1 0x7fffffff 0xffffffff>;
+    octal-cell = <010>;
+    #address-cells = <1>;
+    #size-cells = <0>;
+
+    node@2a {
+        reg = <0x2a>;
+    };
+};

@@ -1,0 +1,19 @@
+/dts-v1/;
+
+/ {
+    refs = <&alias &first &{/targets/explicit} &linux_alias>;
+
+    targets {
+        first: alias: automatic {
+            value = <1>;
+        };
+
+        explicit {
+            phandle = <1>;
+        };
+
+        linux_alias: linux-explicit {
+            linux,phandle = <0x20>;
+        };
+    };
+};

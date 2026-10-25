@@ -1,0 +1,42 @@
+/dts-v1/;
+
+/ {
+    target: device {
+        status = "disabled";
+        old-value = <1>;
+
+        child {
+            first = <1>;
+        };
+    };
+};
+
+/ {
+    model = "merged tree";
+
+    device {
+        status = "okay";
+        new-value = <2>;
+
+        child {
+            second = <2>;
+        };
+
+        added-child {
+            value = <3>;
+        };
+    };
+};
+
+&target {
+    status = "final";
+    via-reference;
+
+    extra-child {
+        value = <4>;
+    };
+};
+
+&{/device/child} {
+    via-path = <5>;
+};

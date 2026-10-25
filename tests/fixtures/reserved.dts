@@ -1,0 +1,8 @@
+/dts-v1/;
+
+/memreserve/ 0x0000000010000000 0x1000;
+/memreserve/ 0xffff000000000000 0x2000;
+
+/ {
+    compatible = "example,reserved-memory";
+};

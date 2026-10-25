@@ -1,0 +1,45 @@
+/dts-v1/;
+
+/ {
+    original-ref = <&replace>;
+
+    replace: replace-me {
+        stale = <1>;
+
+        nested: stale-child {
+            stale = <2>;
+        };
+    };
+
+    container {
+        remove-by-path {
+            stale = <3>;
+        };
+
+        survivor {
+            value = <4>;
+        };
+    };
+};
+
+/delete-node/ &replace;
+/delete-node/ &{/container/remove-by-path};
+
+/ {
+    replacement-ref = <&replace>;
+    recycled-ref = <&nested>;
+
+    replace: replace-me {
+        fresh = <5>;
+    };
+
+    nested: recycled-child {
+        fresh = <6>;
+    };
+
+    container {
+        remove-by-path {
+            restored = <7>;
+        };
+    };
+};

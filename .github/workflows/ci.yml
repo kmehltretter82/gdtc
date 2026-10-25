@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out gdtc
+        uses: actions/checkout@v4
+
+      - name: Check out Goose v2026.3
+        uses: actions/checkout@v4
+        with:
+          repository: aardappel/goose
+          ref: v2026.3
+          path: .goose-toolchain
+          submodules: false
+
+      - name: Install the upstream dtc oracle
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends device-tree-compiler
+
+      - name: Build Goose
+        run: |
+          cmake -S .goose-toolchain -B .goose-toolchain/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build .goose-toolchain/build --parallel 2
+
+      - name: Run differential tests
+        env:
+          GOOSE: ${{ github.workspace }}/.goose-toolchain/build/goose
+        run: make test

@@ -1,0 +1,16 @@
+/dts-v1/;
+
+/ {
+    replaced = <&missing_replaced>;
+    deleted = <&missing_deleted>;
+
+    removed-node {
+        stale = <&missing_node>;
+    };
+};
+
+/ {
+    replaced = <1>;
+    /delete-property/ deleted;
+    /delete-node/ removed-node;
+};

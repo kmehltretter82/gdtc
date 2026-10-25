@@ -1,0 +1,8 @@
+/dts-v1/;
+
+/ {
+    byte-cells = /bits/ 8 <0 0x7f 0xff>;
+    half-cells = /bits/ 16 <0 0x1234 0xffff>;
+    word-cells = /bits/ 32 <'A' '\n' 0xffffffff>;
+    double-cells = /bits/ 64 <0 0x0123456789abcdef 0xffffffffffffffff>;
+};

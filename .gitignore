@@ -1,0 +1,4 @@
+/build/
+/.goose-toolchain/
+/gobjtool/
+.DS_Store

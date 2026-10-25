@@ -1,0 +1,23 @@
+/dts-v1/;
+
+/ {
+    consumer {
+        targets = <&late &early>;
+    };
+
+    early: early-node {
+        value = <1>;
+    };
+
+    late: late-node {
+        value = <2>;
+    };
+
+    backward: backward-node {
+        value = <3>;
+    };
+
+    backward-consumer {
+        target = <&backward>;
+    };
+};
