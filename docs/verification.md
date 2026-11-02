@@ -28,10 +28,10 @@ the checked-in fixtures.
    structure/string blocks. Every accepted fixture must match upstream `dtc`
    byte-for-byte.
 2. **Complete scalar syntax**
-   Character literals and 8/16/32/64-bit `/bits/` values are implemented.
-   Integer expression operators are implemented as well. Labels on values,
-   `/incbin/`, and source includes remain. (`/memreserve/` is already supported
-   by the core stage.)
+   Character literals, 8/16/32/64-bit `/bits/` values, integer literal
+   suffixes, and parenthesized integer expressions are implemented. The lexer
+   follows dtc-lexer.l rule for rule. Labels on values, `/incbin/`, and source
+   includes remain. (`/memreserve/` is already supported by the core stage.)
 3. **Tree resolution**
    Multiple labels per node, label/absolute-path phandle references, explicit
    phandles, repeated-root merges, label/absolute-path target merges, and
@@ -39,8 +39,11 @@ the checked-in fixtures.
    labels, `-@` symbols/fixups, aliases, and
    omitted-if-unused nodes remain.
 4. **Checks and diagnostics**
-   Port upstream structural/semantic checks and maintain a diagnostic
-   compatibility matrix. Add stable JSON diagnostics as an extension.
+   Every upstream check that can reject a tree (the ERROR checks of
+   checks.c) is implemented, as are the fixups that change the blob, and
+   bison's stack limit is reproduced exactly. dtc's warnings remain; maintain
+   a diagnostic compatibility matrix and add stable JSON diagnostics as an
+   extension.
 5. **Reverse and alternate formats**
    DTB input, DTS output, ASM output, and overlay application. YAML is optional
    because it introduces an external library boundary.
@@ -63,9 +66,11 @@ the checked-in fixtures.
 
 ## Current status
 
-The Stage 1 implementation and the implemented portions of Stages 2 and 3 are
+The Stage 1 implementation and the implemented portions of Stages 2 to 4 are
 present. With Goose v2026.3, the current harness typechecks and builds optimized
-and checked-debug executables, byte-matches upstream `dtc` for 12 checked-in
-positive fixtures plus two generated stress trees, and cleanly rejects all 15
-checked-in negative fixtures. The stdin/stdout path and sampled truncated-input
-error paths pass as well.
+and checked-debug executables, byte-matches upstream `dtc` 1.7.0 for 29
+checked-in positive fixtures plus four generated trees, and rejects all 31
+checked-in and four generated negative fixtures with the expected diagnostic
+under the checked-debug build. The stdin/stdout path passes, and every sampled
+prefix of every positive fixture either matches `dtc` or fails through a
+diagnostic, as `dtc` does.
