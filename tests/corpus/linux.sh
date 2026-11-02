@@ -7,6 +7,7 @@
 #
 #   tests/corpus/linux.sh            # uses build/gdtc and dtc from PATH
 #   GDTC=... DTC=... JOBS=8 tests/corpus/linux.sh
+#   FLAGS='-b 0' tests/corpus/linux.sh   # extra flags for both compilers
 #
 # Writes $CORPUS_DIR/results.tsv (the comparison log) and, with
 # UPDATE_RESULTS=1, copies it to tests/corpus/linux-$LINUX_TAG.tsv and
@@ -67,9 +68,10 @@ mkdir -p "$WORK/lines"
 (cd "$LINUX" && find arch -path 'arch/*/boot/dts/*' -name '*.dts' | LC_ALL=C sort) \
     >"$CORPUS_DIR/files.txt"
 echo "corpus: $(wc -l <"$CORPUS_DIR/files.txt" | tr -d ' ') files from Linux $LINUX_TAG," \
-    "$($DTC --version | head -n 1), $JOBS jobs" >&2
+    "$($DTC --version | head -n 1), $JOBS jobs, flags '${FLAGS:-}'" >&2
 
-export LINUX WORK GDTC DTC HOSTCC
+FLAGS=${FLAGS:-}
+export LINUX WORK GDTC DTC HOSTCC FLAGS
 xargs -P "$JOBS" -n 16 "$ROOT/tests/corpus/compare-one.sh" <"$CORPUS_DIR/files.txt"
 
 {
@@ -78,8 +80,9 @@ xargs -P "$JOBS" -n 16 "$ROOT/tests/corpus/compare-one.sh" <"$CORPUS_DIR/files.t
 } >"$CORPUS_DIR/results.tsv"
 
 python3 -I "$ROOT/tests/corpus/summarize.py" "$CORPUS_DIR/results.tsv" \
-    "$LINUX_TAG" "$LINUX_COMMIT" "$($DTC --version | head -n 1)" >"$CORPUS_DIR/corpus.md"
-if [ "${UPDATE_RESULTS:-0}" = 1 ]; then
+    "$LINUX_TAG" "$LINUX_COMMIT" "$($DTC --version | head -n 1)" "$FLAGS" \
+    "$ROOT/tests/corpus/linux-$LINUX_TAG-baseline.tsv" >"$CORPUS_DIR/corpus.md"
+if [ "${UPDATE_RESULTS:-0}" = 1 ] && [ -z "$FLAGS" ]; then
     cp "$CORPUS_DIR/results.tsv" "$ROOT/tests/corpus/linux-$LINUX_TAG.tsv"
     cp "$CORPUS_DIR/corpus.md" "$ROOT/docs/corpus.md"
 fi

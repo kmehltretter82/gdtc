@@ -11,7 +11,8 @@ a version 17 flattened device tree blob.
 
 ## Current support
 
-- `/dts-v1/;` source files, including repeated headers
+- `/dts-v1/;` source files, including repeated headers, `/include/`, and C
+  preprocessor output with line markers
 - dtc's lexer exactly: start conditions, longest-match tokenization, escape
   decoding, integer literal suffixes, and dtc's treatment of a NUL or
   non-ASCII byte outside a string as the end of input
@@ -20,26 +21,35 @@ a version 17 flattened device tree blob.
   `/bits/ 8`, `16`, `32`, and `64` cell widths
 - 64-bit `/memreserve/` entries
 - parenthesized 64-bit integer expressions with dtc's precedence and wrapping
-- multiple labels per node, `&label` and `&{/absolute/path}` phandle
-  references, and explicit `phandle` and `linux,phandle` properties
+- multiple labels per node, labels on merge targets, `&label`,
+  `&{/absolute/path}` and `&{label/relative/path}` references, both as
+  phandles in cell lists and as full paths elsewhere in a value, and explicit
+  `phandle` and `linux,phandle` properties
 - repeated `/ { ... };` definitions, `&label { ... };` and
   `&{/path} { ... };` merges, `/delete-property/`, `/delete-node/`, and
-  top-level `/delete-node/ &ref;`, all with dtc's in-place merge semantics
+  top-level `/delete-node/ &ref;`, all with dtc's in-place merge semantics,
+  and `/omit-if-no-ref/`
 - the dtc checks that can reject a tree (duplicate nodes, properties and
   labels, name characters, `name` properties, explicit phandles, and
   unresolved references) and the fixups that change its blob (redundant
-  `name` properties, tree-order phandle allocation)
+  `name` properties, tree-order phandle allocation, path expansion, unused
+  node removal)
 - dtc's parser stack limit: input that exhausts bison's stack is rejected
   with "memory exhausted" at exactly the same depth
 - the boot CPU guessed from `/cpus`, `-b`, `-q`, `-i`
 - `-I dts`, `-O dtb`, `-o FILE`, input files, and standard input/output
 - deterministic DTB output compatible with upstream `dtc`
 
-Constructs that dtc accepts and gdtc does not yet implement are reported as
-`unsupported: <feature>` rather than misparsed. `--report-unsupported` lists
-every such feature in a file instead of stopping at the first; the corpus
-harness uses it to rank the missing features. Decompilation, overlays, other
-output formats, and dtc's warnings remain to be implemented.
+Every `.dts` file of Linux v7.3 compiles to the same bytes as with dtc 1.7.0;
+see [`docs/corpus.md`](docs/corpus.md).
+
+Constructs that dtc accepts and gdtc does not yet implement (labels on
+properties, values and reservations, `/incbin/`, and `/plugin/`) are reported
+as `unsupported: <feature>` rather than misparsed. `--report-unsupported`
+lists every such feature in a file instead of stopping at the first; the
+corpus harness uses it to rank the missing features. Decompilation, `-@`
+symbols, overlays, other output formats, and dtc's warnings remain to be
+implemented.
 The compatibility gates and planned order are recorded in
 [`docs/verification.md`](docs/verification.md).
 
@@ -68,6 +78,13 @@ The conformance harness requires both `goose` and upstream `dtc`:
 
 ```sh
 make test
+```
+
+`make corpus` runs the Linux corpus (it clones about 100 MB of a pinned
+kernel release once, into `build/corpus`):
+
+```sh
+make corpus
 ```
 
 Without Goose installed, the upstream fixture contract can still be checked:

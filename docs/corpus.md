@@ -10,9 +10,9 @@ both blobs, is [`tests/corpus/linux-v7.3.tsv`](../tests/corpus/linux-v7.3.tsv).
 
 | Result | Files | Meaning |
 |---|---:|---|
-| identical | 3657 | dtc and gdtc both succeed; the blobs are byte-identical |
+| identical | 3672 | dtc and gdtc both succeed; the blobs are byte-identical |
 | different | 0 | both succeed; the blobs differ |
-| unsupported | 15 | dtc succeeds; gdtc reports an unimplemented feature |
+| unsupported | 0 | dtc succeeds; gdtc reports an unimplemented feature |
 | gdtc-error | 0 | dtc succeeds; gdtc fails for another reason |
 | gdtc-accepts | 0 | dtc fails; gdtc succeeds |
 | both-reject | 0 | dtc and gdtc both fail |
@@ -21,11 +21,24 @@ both blobs, is [`tests/corpus/linux-v7.3.tsv`](../tests/corpus/linux-v7.3.tsv).
 
 ## Missing features
 
+No file needs an unimplemented feature.
+
+## Missing features at the baseline
+
 Files are counted once per feature they need. *Unblocks* follows a greedy
 implementation order: each row is the feature that, added to the rows above
 it, lets the most remaining files compile.
 
 | Order | Feature | Files needing it | Only missing feature | Unblocks | Cumulative |
 |---:|---|---:|---:|---:|---:|
-| 1 | `label-relative-path` | 15 | 15 | 15 | 15 |
+| 1 | `line-marker` | 3672 | 105 | 105 | 105 |
+| 2 | `path-reference` | 3526 | 0 | 2842 | 2947 |
+| 3 | `omit-if-no-ref` | 395 | 0 | 378 | 3325 |
+| 4 | `include` | 252 | 0 | 252 | 3577 |
+| 5 | `label-on-reference` | 80 | 0 | 80 | 3657 |
+| 6 | `label-relative-path` | 15 | 0 | 15 | 3672 |
+
+The baseline is [`tests/corpus/linux-v7.3-baseline.tsv`](../tests/corpus/linux-v7.3-baseline.tsv), the first run of the harness,
+before any of these features was implemented. They were then implemented
+in this order; see [`verification.md`](verification.md) for the progression.
 

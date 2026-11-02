@@ -29,15 +29,16 @@ the checked-in fixtures.
    byte-for-byte.
 2. **Complete scalar syntax**
    Character literals, 8/16/32/64-bit `/bits/` values, integer literal
-   suffixes, and parenthesized integer expressions are implemented. The lexer
-   follows dtc-lexer.l rule for rule. Labels on values, `/incbin/`, and source
-   includes remain. (`/memreserve/` is already supported by the core stage.)
+   suffixes, parenthesized integer expressions, `/include/`, and cpp line
+   markers are implemented. The lexer follows dtc-lexer.l rule for rule.
+   Labels on values and `/incbin/` remain. (`/memreserve/` is already
+   supported by the core stage.)
 3. **Tree resolution**
-   Multiple labels per node, label/absolute-path phandle references, explicit
-   phandles, repeated-root merges, label/absolute-path target merges, and
-   deletion directives within fragments are implemented. Property/value
-   labels, `-@` symbols/fixups, aliases, and
-   omitted-if-unused nodes remain.
+   Multiple labels per node, labels on merge targets, label, absolute-path
+   and label-relative phandle and path references, explicit phandles,
+   repeated-root merges, label/path target merges, deletion directives, and
+   `/omit-if-no-ref/` are implemented. Property/value labels and `-@`
+   symbols/fixups remain.
 4. **Checks and diagnostics**
    Every upstream check that can reject a tree (the ERROR checks of
    checks.c) is implemented, as are the fixups that change the blob, and
@@ -70,11 +71,37 @@ the checked-in fixtures.
 
 ## Current status
 
-The Stage 1 implementation and the implemented portions of Stages 2 to 4 are
-present. With Goose v2026.3, the current harness typechecks and builds optimized
-and checked-debug executables, byte-matches upstream `dtc` 1.7.0 for 29
-checked-in positive fixtures plus four generated trees, and rejects all 31
+The Stage 1 implementation and the implemented portions of Stages 2 to 4 and 6
+are present. With Goose v2026.3, the current harness typechecks and builds
+optimized and checked-debug executables, byte-matches upstream `dtc` 1.7.0 for
+35 checked-in positive fixtures plus four generated trees, and rejects all 38
 checked-in and four generated negative fixtures with the expected diagnostic
 under the checked-debug build. The stdin/stdout path passes, and every sampled
 prefix of every positive fixture either matches `dtc` or fails through a
 diagnostic, as `dtc` does.
+
+### Linux corpus
+
+All 3672 `.dts` files of Linux v7.3 compile byte-identically to `dtc` 1.7.0,
+both with `dtc`'s defaults and with the kernel's `-b 0`; the logs with both
+blobs' SHA-256 are `tests/corpus/linux-v7.3.tsv` and
+`tests/corpus/linux-v7.3-b0.tsv`, and [`corpus.md`](corpus.md) has the summary.
+110 files differ between the two runs because `dtc` guesses a nonzero boot CPU
+from `/cpus` by default.
+
+The first run of the harness ranked the features gdtc was missing by how many
+files each one unblocks. They were implemented in that order:
+
+| Commit | Feature | Files needing it | Byte-identical after |
+|---|---|---:|---:|
+| 35baf42 | (baseline) | | 0 |
+| 7487b48 | cpp line markers | 3672 | 105 |
+| 581b870 | path references in property values | 3526 | 2947 |
+| 46d2dbe | `/omit-if-no-ref/` | 395 | 3325 |
+| aaf4399 | `/include/` | 252 | 3577 |
+| c6a4f4e | a label on a merge target | 80 | 3657 |
+| 2132f55 | label-relative paths, `&{label/path}` | 15 | 3672 |
+
+No file needs property or value labels, `/incbin/`, or `/plugin/`. The kernel
+also passes `-@` when building a base tree for overlays; gdtc does not
+implement `-@` yet, so the corpus compares the trees without symbols.

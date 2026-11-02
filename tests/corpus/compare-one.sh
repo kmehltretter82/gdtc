@@ -3,7 +3,8 @@
 #
 # Compile Linux device tree sources with dtc and gdtc and classify each one.
 # Called by linux.sh with LINUX, WORK, GDTC, DTC and HOSTCC in the
-# environment and paths relative to $LINUX as arguments.
+# environment and paths relative to $LINUX as arguments. FLAGS, if set, is
+# passed to both compilers (for example -b 0, as the kernel's build does).
 set -u
 
 INC="$LINUX/scripts/dtc/include-prefixes"
@@ -25,10 +26,12 @@ for rel in "$@"; do
     fi
     srcdir=$(dirname "$src")
 
-    "$DTC" -q -I dts -O dtb -o "$dir/dtc.dtb" -i "$srcdir" -i "$INC" "$pre" \
+    # shellcheck disable=SC2086
+    "$DTC" -q ${FLAGS:-} -I dts -O dtb -o "$dir/dtc.dtb" -i "$srcdir" -i "$INC" "$pre" \
         >/dev/null 2>"$dir/dtc.err"
     dtc_rc=$?
-    "$GDTC" -q -I dts -O dtb -o "$dir/gdtc.dtb" -i "$srcdir" -i "$INC" "$pre" \
+    # shellcheck disable=SC2086
+    "$GDTC" -q ${FLAGS:-} -I dts -O dtb -o "$dir/gdtc.dtb" -i "$srcdir" -i "$INC" "$pre" \
         >/dev/null 2>"$dir/gdtc.err"
     gdtc_rc=$?
 
