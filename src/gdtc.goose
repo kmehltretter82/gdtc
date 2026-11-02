@@ -1406,10 +1406,7 @@ fn subnode() -> Item..& {
     var prefix = 0;
     var omit = false;
     while kind() == T_LABEL || kind() == T_OMIT {
-        if kind() == T_OMIT {
-            unsupported(tp, "omit-if-no-ref");
-            omit = true;
-        }
+        if kind() == T_OMIT { omit = true; }
         shift();
         prefix++;
     }
@@ -1828,7 +1825,6 @@ fn parse() -> Item..& {
         }
         else if kind() == T_DEL_NODE || kind() == T_OMIT {
             let omit = kind() == T_OMIT;
-            if omit { unsupported(tp, "omit-if-no-ref"); }
             shift();
             if kind() != T_LABEL_REF && kind() != T_PATH_REF { syntax_error(); }
             let ref_at = tp;
@@ -2275,6 +2271,22 @@ recursive fn fixup_path_references(tree: Item.Node&, node: Item.Node&) {
     }
 }
 
+// fixup_omit_unused_nodes: an /omit-if-no-ref/ node that no live property
+// referred to is deleted. The flag belongs to the node it was written on;
+// merging a flagged node into an existing one does not pass it on.
+recursive fn omit_unused_nodes(node: Item.Node&) {
+    if node.omit_if_unused && !node.referenced {
+        delete_node(node);
+        return;
+    }
+    var entry: Item..? = node.children;
+    while entry {
+        let child = node_of(entry);
+        if !child.deleted { omit_unused_nodes(child); }
+        entry .= child.next;
+    }
+}
+
 fn check_tree(tree: Item.Node&) {
     check_names(tree);
     check_name_chars(tree);
@@ -2285,6 +2297,7 @@ fn check_tree(tree: Item.Node&) {
     check_explicit_phandles(tree, tree);
     fixup_phandle_references(tree, tree);
     fixup_path_references(tree, tree);
+    omit_unused_nodes(tree);
 }
 
 // ---------------------------------------------------------------------------

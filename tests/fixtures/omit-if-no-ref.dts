@@ -1,0 +1,57 @@
+/dts-v1/;
+
+/*
+ * /omit-if-no-ref/ nodes survive only if a live property refers to them, by
+ * phandle or by path. References from nodes that are themselves omitted still
+ * count, and still allocate phandles. The flag is not merged into an existing
+ * node, and the whole subtree goes with an omitted node.
+ */
+/ {
+    used: used {
+    };
+
+    /omit-if-no-ref/ unused: unused {
+        child {
+        };
+    };
+
+    /omit-if-no-ref/ by_path: by-path {
+    };
+
+    /omit-if-no-ref/ chain: chain {
+    };
+
+    /omit-if-no-ref/ dropper {
+        p = <&chain>;
+    };
+
+    /omit-if-no-ref/ stale_ref: stale-ref {
+    };
+
+    later {
+    };
+
+    kept {
+    };
+
+    consumer {
+        a = <&used>;
+        b = &by_path;
+        c = <&stale_ref_placeholder>;
+    };
+
+    stale_ref_placeholder: placeholder {
+        gone = <&stale_ref>;
+    };
+};
+
+/omit-if-no-ref/ &{/later};
+
+/ {
+    /omit-if-no-ref/ kept {
+    };
+
+    placeholder {
+        /delete-property/ gone;
+    };
+};
