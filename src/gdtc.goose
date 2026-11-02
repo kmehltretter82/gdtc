@@ -2278,19 +2278,7 @@ var blob: u8[>..] = [];
 fn compile(path: const u8[:]) -> u8[>..] {
     lex(path);
     let tree = node_of(parse());
-    if report_unsupported {
-        if unsupported_seen.len > 0 {
-            var list: u8[>..] = [];
-            each_split(unsupported_seen, '\n') {
-                if it.len > 0 {
-                    if list.len > 0 { list.push(' '); }
-                    list.append(it);
-                }
-            };
-            return str("gdtc: unsupported features: ", list);
-        }
-        return str("");
-    }
+    if report_unsupported { return str(""); }
     if !boot_cpuid_set { guess_boot_cpuid(tree); }
     check_tree(tree);
     emit(tree, blob);
@@ -2348,11 +2336,25 @@ fn main() {
     if input_at < 0 { usage(); }
 
     let error = compile(argv[input_at]);
+    if report_unsupported {
+        // One line on stdout naming every unsupported feature, then any
+        // other error on stderr. Exit 3 if a feature is missing.
+        var list: u8[>..] = [];
+        each_split(unsupported_seen, '\n') {
+            if it.len > 0 {
+                if list.len > 0 { list.push(' '); }
+                list.append(it);
+            }
+        };
+        write_stdout(str("unsupported:", if list.len > 0 { " " } else { "" }, list, "\n"));
+        if error.len > 0 { write_stderr(str(error, "\n")); }
+        if unsupported_seen.len > 0 { exit(3); }
+        exit(if error.len > 0 { 1 } else { 0 });
+    }
     if error.len > 0 {
         write_stderr(str(error, "\n"));
-        exit(if report_unsupported && unsupported_seen.len > 0 { 3 } else { 1 });
+        exit(1);
     }
-    if report_unsupported { exit(0); }
     if output_at >= 0 {
         if !write_file(argv[output_at], blob) {
             write_stderr(str("gdtc: cannot write ", argv[output_at], "\n"));

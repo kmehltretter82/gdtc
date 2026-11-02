@@ -49,7 +49,11 @@ the checked-in fixtures.
    because it introduces an external library boundary.
 6. **Corpus qualification**
    Upstream dtc tests, all applicable Linux DTS/DTSI sources after preprocessing,
-   malformed/fuzzed DTBs, and cross-endian fixtures.
+   malformed/fuzzed DTBs, and cross-endian fixtures. `make corpus` runs the
+   Linux part: a shallow sparse checkout of a pinned release, every
+   `arch/*/boot/dts/**/*.dts` preprocessed with the kernel's cpp flags, and
+   both compilers on each result. The per-file log and the ranking of missing
+   features are in [`corpus.md`](corpus.md).
 
 ## Required gates
 
