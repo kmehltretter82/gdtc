@@ -1821,10 +1821,8 @@ fn parse() -> Item..& {
             shrink(if label_at >= 0 { 3 } else { 2 });
             let target = get_node_by_ref(tree, ref, ref_at);
             guard target else { fail_at(ref_at, str("Label or path ", ref, " not found")); }
-            if label_at >= 0 {
-                unsupported(label_at, "label-on-reference");
-                add_node_label(target, token_text(label_at));
-            }
+            // devicetree DT_LABEL dt_ref nodedef: label the target, then merge.
+            if label_at >= 0 { add_node_label(target, token_text(label_at)); }
             if target .== tree { merge_nodes(target, tree_item, node_of(fragment)); }
             else { merge_nodes(target, item_of(target), node_of(fragment)); }
         }

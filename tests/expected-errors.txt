@@ -41,3 +41,4 @@ invalid-line-marker-nul	nul in line number directive
 invalid-path-reference-value	Reference to non-existent node or label "missing"
 invalid-include-missing	Couldn't open "include/does-not-exist.dtsi"
 invalid-include-recursion	Includes nested too deeply
+invalid-label-on-reference-duplicate	Duplicate label 'taken'

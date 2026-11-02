@@ -1,0 +1,28 @@
+/dts-v1/;
+
+/*
+ * A label in front of a merge target is added to the target node before the
+ * fragment is merged into it. Restating the node's own label is harmless.
+ */
+/ {
+    uart: serial@1000 {
+    };
+};
+
+console: &uart {
+    status = "okay";
+};
+
+by_path: &{/serial@1000} {
+    extra;
+};
+
+uart: &console {
+};
+
+/ {
+    user {
+        cells = <&console &by_path &uart>;
+        path = &console;
+    };
+};

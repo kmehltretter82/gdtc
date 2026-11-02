@@ -10,9 +10,9 @@ both blobs, is [`tests/corpus/linux-v7.3.tsv`](../tests/corpus/linux-v7.3.tsv).
 
 | Result | Files | Meaning |
 |---|---:|---|
-| identical | 3577 | dtc and gdtc both succeed; the blobs are byte-identical |
+| identical | 3657 | dtc and gdtc both succeed; the blobs are byte-identical |
 | different | 0 | both succeed; the blobs differ |
-| unsupported | 95 | dtc succeeds; gdtc reports an unimplemented feature |
+| unsupported | 15 | dtc succeeds; gdtc reports an unimplemented feature |
 | gdtc-error | 0 | dtc succeeds; gdtc fails for another reason |
 | gdtc-accepts | 0 | dtc fails; gdtc succeeds |
 | both-reject | 0 | dtc and gdtc both fail |
@@ -27,6 +27,5 @@ it, lets the most remaining files compile.
 
 | Order | Feature | Files needing it | Only missing feature | Unblocks | Cumulative |
 |---:|---|---:|---:|---:|---:|
-| 1 | `label-on-reference` | 80 | 80 | 80 | 80 |
-| 2 | `label-relative-path` | 15 | 15 | 15 | 95 |
+| 1 | `label-relative-path` | 15 | 15 | 15 | 15 |
 
