@@ -129,6 +129,7 @@ struct Frame {
     pos: i64,
     end: i64,
     file: i64,
+    physical: i64,
     line: i64,
 }
 
@@ -453,7 +454,8 @@ fn lex(main_path: const u8[:]) {
     var begin = 0;
     var pos = 0;
     var end = 0;
-    var file: i64 = 0;
+    var file: i64 = 0;                    // the name diagnostics use
+    var physical: i64 = 0;                // the file actually being read
     var line: i64 = 1;
     var state = LEX_INITIAL;
 
@@ -472,6 +474,7 @@ fn lex(main_path: const u8[:]) {
         }
         file = opened;
     }
+    physical = file;
     end = source.len;
 
     fn emit(kind: i64, start: i64, len: i64, value: u64) {
@@ -670,7 +673,7 @@ fn lex(main_path: const u8[:]) {
     fn push_include(name: const u8[:]) {
         if frames.len + 1 >= MAX_SOURCE_DEPTH { lex_fail("includes nested too deeply"); }
         let start = source.len;
-        var opened = try_read(directory_of(file), name);
+        var opened = try_read(directory_of(physical), name);
         if opened < 0 {
             var found = -1;
             each_split(include_dirs, '\n') {
@@ -679,8 +682,16 @@ fn lex(main_path: const u8[:]) {
             opened = found;
         }
         if opened < 0 { lex_fail(str("cannot open include file \"", name, "\"")); }
-        frames.push(Frame { begin: begin, pos: pos, end: end, file: file, line: line });
+        frames.push(Frame {
+            begin: begin,
+            pos: pos,
+            end: end,
+            file: file,
+            physical: physical,
+            line: line,
+        });
         file = opened;
+        physical = opened;
         line = 1;
         begin = start;
         pos = start;
@@ -695,6 +706,7 @@ fn lex(main_path: const u8[:]) {
             pos = f.pos;
             end = f.end;
             file = f.file;
+            physical = f.physical;
             line = f.line;
             continue;
         }
@@ -744,8 +756,26 @@ fn lex(main_path: const u8[:]) {
             push_include(raw);
         }
         else if rule == 2 {
+            // A cpp line marker names the file and line of the next line.
+            // As in srcpos_set_line, it changes only what diagnostics say:
+            // includes still resolve against the file being read.
+            var at = 1;
+            while !is_digit(text[at]) { at++; }
+            var number: i64 = 0;
+            while at < text.len && is_digit(text[at]) {
+                if number < 1000000000 { number = number * 10 + (text[at] - '0'); }
+                at++;
+            }
+            let open = find(text, "\"");
+            let close = rfind(text, "\"");
+            var name: u8[>..] = [];
+            if !decode_escapes(text[open + 1..close], name) {
+                lex_fail("\\x used with no following hex digits");
+            }
+            for c in name { if c == 0 { lex_fail("nul in line number directive"); } }
             advance(best);
-            unsupported(tokens.len, "line-marker");
+            file = add_source_name(name);
+            line = number - 1;
         }
         else if rule == 3 {
             emit(T_STRING, start + 1, best - 2, 0);

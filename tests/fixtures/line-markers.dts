@@ -1,0 +1,16 @@
+# 1 "line-markers.dts"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "line-markers.dts"
+/dts-v1/;
+# 1 "include/board.dtsi" 1
+/ {
+#address-cells = <1>;
+# 12 "include/board.dtsi"
+	#size-cells = <1>;
+};
+#line 7 "esc\x41ped\\name.dts" 2 3 4
+# 9 "trailing-blanks.dts" 	
+/ {
+    model = "after markers";
+};

@@ -10,9 +10,9 @@ both blobs, is [`tests/corpus/linux-v7.3.tsv`](../tests/corpus/linux-v7.3.tsv).
 
 | Result | Files | Meaning |
 |---|---:|---|
-| identical | 0 | dtc and gdtc both succeed; the blobs are byte-identical |
+| identical | 105 | dtc and gdtc both succeed; the blobs are byte-identical |
 | different | 0 | both succeed; the blobs differ |
-| unsupported | 3672 | dtc succeeds; gdtc reports an unimplemented feature |
+| unsupported | 3567 | dtc succeeds; gdtc reports an unimplemented feature |
 | gdtc-error | 0 | dtc succeeds; gdtc fails for another reason |
 | gdtc-accepts | 0 | dtc fails; gdtc succeeds |
 | both-reject | 0 | dtc and gdtc both fail |
@@ -27,10 +27,9 @@ it, lets the most remaining files compile.
 
 | Order | Feature | Files needing it | Only missing feature | Unblocks | Cumulative |
 |---:|---|---:|---:|---:|---:|
-| 1 | `line-marker` | 3672 | 105 | 105 | 105 |
-| 2 | `path-reference` | 3526 | 0 | 2842 | 2947 |
-| 3 | `omit-if-no-ref` | 395 | 0 | 378 | 3325 |
-| 4 | `include` | 252 | 0 | 252 | 3577 |
-| 5 | `label-on-reference` | 80 | 0 | 80 | 3657 |
-| 6 | `label-relative-path` | 15 | 0 | 15 | 3672 |
+| 1 | `path-reference` | 3526 | 2842 | 2842 | 2842 |
+| 2 | `omit-if-no-ref` | 395 | 0 | 378 | 3220 |
+| 3 | `include` | 252 | 41 | 252 | 3472 |
+| 4 | `label-on-reference` | 80 | 0 | 80 | 3552 |
+| 5 | `label-relative-path` | 15 | 0 | 15 | 3567 |
 

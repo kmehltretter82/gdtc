@@ -36,3 +36,5 @@ generated-invalid-deep-nesting	memory exhausted
 generated-invalid-deep-parens	memory exhausted
 generated-invalid-paren-depth	memory exhausted
 generated-invalid-stack-depth	memory exhausted
+invalid-line-marker-location	board.dts:41: syntax error
+invalid-line-marker-nul	nul in line number directive
