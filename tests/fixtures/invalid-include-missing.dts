@@ -1,0 +1,6 @@
+/dts-v1/;
+
+/include/ "include/does-not-exist.dtsi"
+
+/ {
+};

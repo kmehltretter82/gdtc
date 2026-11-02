@@ -421,7 +421,9 @@ fn add_source_name(name: const u8[:]) -> i64 {
 }
 
 // dtc's join_path and try_open: a relative name is looked up in the
-// including file's directory, then in every -i directory.
+// including file's directory, then in every -i directory. Returns the new
+// source file, -1 if there is no such file, and -2 for a directory, which
+// dtc opens and then fails to read.
 fn try_read(dir: const u8[:], name: const u8[:]) -> i64 {
     var full: u8[>..] = [];
     if dir.len == 0 || (name.len > 0 && name[0] == '/') { full.append(name); }
@@ -430,11 +432,21 @@ fn try_read(dir: const u8[:], name: const u8[:]) -> i64 {
         if dir[dir.len - 1] != '/' { full.push('/'); }
         full.append(name);
     }
-    if is_dir(full) { return -1; }
+    if is_dir(full) { return -2; }
     let before = source.len;
     if !read_file(full, source) { return -1; }
     if source.len < before { return -1; }
     return add_source_name(full);
+}
+
+// fopen_any_on_path: the current directory first, then each -i directory.
+fn open_on_path(dir: const u8[:], name: const u8[:]) -> i64 {
+    var opened = try_read(dir, name);
+    if opened != -1 { return opened; }
+    each_split(include_dirs, '\n') {
+        if opened == -1 && it.len > 0 { opened = try_read(it, name); }
+    };
+    return opened;
 }
 
 fn directory_of(file: i64) -> const u8[:] {
@@ -468,7 +480,7 @@ fn lex(main_path: const u8[:]) {
         read_stdin(source);
     }
     else {
-        let opened = try_read("", main_path);
+        let opened = open_on_path("", main_path);
         if opened < 0 {
             return str("gdtc: cannot read ", main_path) from compile;
         }
@@ -671,17 +683,11 @@ fn lex(main_path: const u8[:]) {
     }
 
     fn push_include(name: const u8[:]) {
-        if frames.len + 1 >= MAX_SOURCE_DEPTH { lex_fail("includes nested too deeply"); }
+        if frames.len + 1 >= MAX_SOURCE_DEPTH { lex_fail("Includes nested too deeply"); }
         let start = source.len;
-        var opened = try_read(directory_of(physical), name);
-        if opened < 0 {
-            var found = -1;
-            each_split(include_dirs, '\n') {
-                if found < 0 && it.len > 0 { found = try_read(it, name); }
-            };
-            opened = found;
-        }
-        if opened < 0 { lex_fail(str("cannot open include file \"", name, "\"")); }
+        let opened = open_on_path(directory_of(physical), name);
+        if opened == -2 { lex_fail(str("cannot read \"", name, "\": is a directory")); }
+        if opened < 0 { lex_fail(str("Couldn't open \"", name, "\"")); }
         frames.push(Frame {
             begin: begin,
             pos: pos,
@@ -752,7 +758,6 @@ fn lex(main_path: const u8[:]) {
             let quote = find(text, "\"");
             let raw = text[quote + 1..text.len - 1];
             advance(best);
-            unsupported(tokens.len, "include");
             push_include(raw);
         }
         else if rule == 2 {

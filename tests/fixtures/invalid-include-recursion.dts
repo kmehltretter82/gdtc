@@ -1,0 +1,6 @@
+/dts-v1/;
+
+/* dtc stops after 200 nested source files. */
+/ {
+    /include/ "include/self.dtsi"
+};
