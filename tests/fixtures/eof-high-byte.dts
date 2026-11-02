@@ -1,0 +1,7 @@
+/dts-v1/;
+
+/* dtc reads a byte >= 0x80 outside a string as the end of its input. */
+/ {
+    value = <1>;
+};
+ÿ trailing text is never parsed {

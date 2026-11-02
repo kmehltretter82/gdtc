@@ -1,0 +1,8 @@
+/dts-v1/;
+
+/* A "name" property must repeat the base name of its node. */
+/ {
+    node {
+        name = "other";
+    };
+};

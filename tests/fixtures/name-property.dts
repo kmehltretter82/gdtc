@@ -1,0 +1,17 @@
+/dts-v1/;
+
+/* dtc drops a "name" property that merely repeats the node's base name. */
+/ {
+    #address-cells = <1>;
+    #size-cells = <0>;
+
+    device@1 {
+        name = "device";
+        reg = <1>;
+    };
+
+    other {
+        name = "other";
+        kept = <1>;
+    };
+};

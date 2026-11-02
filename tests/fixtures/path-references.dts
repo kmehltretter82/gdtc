@@ -1,0 +1,33 @@
+/dts-v1/;
+
+/*
+ * A reference outside a cell list is replaced by the target's full path and
+ * a NUL, wherever it appears in the value.
+ */
+/ {
+    aliases {
+        serial0 = &uart;
+        by-path = &{/soc/serial@1000};
+        root = &{/};
+        mixed = "before", &uart, <1 &uart>, &{/soc}, [ab], &late;
+        stale = &missing;
+    };
+
+    soc {
+        uart: serial@1000 {
+        };
+    };
+};
+
+/ {
+    aliases {
+        /delete-property/ stale;
+    };
+
+    soc {
+        bus {
+            late: device@2 {
+            };
+        };
+    };
+};

@@ -1,0 +1,6 @@
+/dts-v1/;
+
+/* Unary minus also needs parentheses inside a cell list. */
+/ {
+    value = <-1>;
+};

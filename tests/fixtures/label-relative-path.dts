@@ -1,0 +1,33 @@
+/dts-v1/;
+
+/*
+ * &{label/path} starts the path at the labelled node. It works as a merge
+ * target, a deletion target, a phandle reference and a path reference.
+ */
+/ {
+    pinctrl: pinctrl {
+        uart_pins: uart {
+            pins1 {
+                function = "uart";
+            };
+
+            pins2 {
+            };
+
+            pins3 {
+            };
+        };
+    };
+
+    consumer {
+        phandle-ref = <&{uart_pins/pins1}>;
+        path-ref = &{pinctrl/uart/pins2};
+        trailing = &{uart_pins/};
+    };
+};
+
+&{uart_pins/pins1} {
+    bias-pull-up;
+};
+
+/delete-node/ &{uart_pins/pins3};

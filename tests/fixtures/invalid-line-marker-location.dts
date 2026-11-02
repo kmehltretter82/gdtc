@@ -1,0 +1,7 @@
+/dts-v1/;
+
+/* Diagnostics name the file and line that the last line marker gives. */
+# 40 "board.dts"
+/ {
+    value = <1 + 2>;
+};

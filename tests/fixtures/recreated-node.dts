@@ -1,0 +1,27 @@
+/dts-v1/;
+
+/*
+ * A recreated node is merged into its deleted predecessor, so properties keep
+ * their original positions and only new ones are appended.
+ */
+/ {
+    node {
+        a = <1>;
+        b = <2>;
+
+        child {
+        };
+    };
+};
+
+/ {
+    /delete-node/ node;
+};
+
+/ {
+    node {
+        b = <3>;
+        a = <4>;
+        c = <5>;
+    };
+};

@@ -1,0 +1,14 @@
+/dts-v1/;
+
+/*
+ * dtc decodes \x with one or two hex digits through strtol, and octal escapes
+ * with up to three digits truncated to a byte.
+ */
+/ {
+    short-hex = "\x1z";
+    octal-wrap = "\777\400";
+    strtol-sign = "\x-1\x+2";
+    strtol-space = "\x 3";
+    unknown = "\q\%";
+    chars = <'\x7' '\777' '\''>;
+};

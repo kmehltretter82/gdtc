@@ -1,0 +1,17 @@
+/dts-v1/;
+
+/*
+ * /include/ splices another source into the token stream. A relative name
+ * is found next to the file that includes it, and the lexer's state carries
+ * across the boundary in both directions.
+ */
+/include/ "include/memreserve.dtsi"
+
+/ {
+    /include/ "include/properties.dtsi"
+    value = /include/ "include/cells.dtsi" , "tail";
+
+    child {
+        /include/"include/nested/child.dtsi"
+    };
+};

@@ -8,7 +8,7 @@ SOURCE := src/gdtc.goose
 
 export GOOSE_HOME
 
-.PHONY: all build check oracle test clean
+.PHONY: all build check oracle test corpus clean
 
 all: build
 
@@ -24,6 +24,10 @@ oracle:
 
 test:
 	GOOSE=$(GOOSE) tests/run.sh
+
+# Stage 6: compile every Linux DTS with dtc and gdtc (needs network once).
+corpus: build
+	GDTC=$(CURDIR)/$(TARGET) tests/corpus/linux.sh
 
 clean:
 	rm -rf -- "$(CURDIR)/build"

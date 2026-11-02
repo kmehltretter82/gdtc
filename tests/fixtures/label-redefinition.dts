@@ -1,0 +1,45 @@
+/dts-v1/;
+
+/*
+ * Repeating a label on the node that already carries it is not a duplicate:
+ * board files routinely restate a SoC label when they extend its node.
+ */
+/ {
+    uart: serial@1000 {
+        reg = <0x1000 0x100>;
+    };
+
+    a: twin-1 {
+    };
+
+    a: twin-2 {
+    };
+};
+
+/ {
+    uart: serial@1000 {
+        status = "okay";
+    };
+};
+
+&uart {
+    port: port {
+    };
+};
+
+/ {
+    serial@1000 {
+        port: port {
+            ready;
+        };
+    };
+};
+
+/* The first node in tree order wins; once it is gone the label is unique. */
+/delete-node/ &a;
+
+/ {
+    user {
+        ref = <&uart &port &a>;
+    };
+};

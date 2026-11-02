@@ -1,0 +1,12 @@
+/dts-v1/;
+
+/ {
+    taken: first {
+    };
+
+    second {
+    };
+};
+
+taken: &{/second} {
+};

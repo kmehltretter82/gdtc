@@ -1,0 +1,7 @@
+/dts-v1/;
+
+/ {
+    aliases {
+        serial0 = &missing;
+    };
+};

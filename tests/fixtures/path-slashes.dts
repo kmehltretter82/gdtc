@@ -1,0 +1,15 @@
+/dts-v1/;
+
+/* dtc skips repeated and trailing slashes in path references. */
+/ {
+    ref = <&{//outer//inner/}>;
+
+    outer {
+        inner {
+        };
+    };
+};
+
+&{/outer/} {
+    merged;
+};

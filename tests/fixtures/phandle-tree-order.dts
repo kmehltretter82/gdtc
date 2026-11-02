@@ -1,0 +1,25 @@
+/dts-v1/;
+
+/*
+ * dtc allocates phandles while walking the final tree, not in source order.
+ * The reference to "second" is merged into a node that precedes the one that
+ * refers to "first", so "second" receives phandle 1.
+ */
+/ {
+    first: first {
+    };
+
+    second: second {
+    };
+
+    early-consumer {
+    };
+
+    late-consumer {
+        ref = <&first>;
+    };
+};
+
+&{/early-consumer} {
+    ref = <&second>;
+};

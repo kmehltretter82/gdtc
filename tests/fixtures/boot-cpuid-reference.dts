@@ -1,0 +1,13 @@
+/dts-v1/;
+
+/*
+ * The boot CPU is guessed before references are resolved, so a reference in
+ * the first CPU's "reg" contributes dtc's 0xffffffff placeholder.
+ */
+/ {
+    cpus {
+        first: cpu {
+            reg = <&first>;
+        };
+    };
+};

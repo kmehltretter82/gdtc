@@ -1,0 +1,2 @@
+model = "from an include";
+/include/ "nested/compatible.dtsi"

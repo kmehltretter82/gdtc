@@ -11,30 +11,45 @@ a version 17 flattened device tree blob.
 
 ## Current support
 
-- `/dts-v1/;` source files
-- nested nodes, including unit addresses
-- boolean properties
-- quoted strings and string lists
-- cell lists with decimal, hexadecimal, octal, and character values
-- byte arrays
+- `/dts-v1/;` source files, including repeated headers, `/include/`, and C
+  preprocessor output with line markers
+- dtc's lexer exactly: start conditions, longest-match tokenization, escape
+  decoding, integer literal suffixes, and dtc's treatment of a NUL or
+  non-ASCII byte outside a string as the end of input
+- nested nodes, unit addresses, escaped names, boolean properties, strings,
+  string lists, cell lists, byte strings, character literals, and
+  `/bits/ 8`, `16`, `32`, and `64` cell widths
 - 64-bit `/memreserve/` entries
-- multiple labels per node and `&label`/`&{/absolute/path}` references in
-  32-bit cell lists
-- explicit `phandle` and `linux,phandle` properties, including validation and
-  collision-free automatic allocation
-- character literals and `/bits/ 8`, `16`, `32`, and `64` cell widths
-- 64-bit unary, arithmetic, shift, comparison, bitwise, logical, and ternary
-  expressions with `dtc` precedence and wrapping behavior
-- repeated `/ { ... };` definitions and `&label { ... };` node merges
-- absolute `&{/node/path} { ... };` merge targets
-- `/delete-property/` and `/delete-node/` within merge fragments, plus top-level
-  `/delete-node/ &label;` and `/delete-node/ &{/absolute/path};`
-- `//` and `/* ... */` comments
+- parenthesized 64-bit integer expressions with dtc's precedence and wrapping
+- multiple labels per node, labels on merge targets, `&label`,
+  `&{/absolute/path}` and `&{label/relative/path}` references, both as
+  phandles in cell lists and as full paths elsewhere in a value, and explicit
+  `phandle` and `linux,phandle` properties
+- repeated `/ { ... };` definitions, `&label { ... };` and
+  `&{/path} { ... };` merges, `/delete-property/`, `/delete-node/`, and
+  top-level `/delete-node/ &ref;`, all with dtc's in-place merge semantics,
+  and `/omit-if-no-ref/`
+- the dtc checks that can reject a tree (duplicate nodes, properties and
+  labels, name characters, `name` properties, explicit phandles, and
+  unresolved references) and the fixups that change its blob (redundant
+  `name` properties, tree-order phandle allocation, path expansion, unused
+  node removal)
+- dtc's parser stack limit: input that exhausts bison's stack is rejected
+  with "memory exhausted" at exactly the same depth
+- the boot CPU guessed from `/cpus`, `-b`, `-q`, `-i`
 - `-I dts`, `-O dtb`, `-o FILE`, input files, and standard input/output
 - deterministic DTB output compatible with upstream `dtc`
 
-Labels on properties or values, includes, `/incbin/`, overlays,
-decompilation, and the upstream warning/check system remain to be implemented.
+Every `.dts` file of Linux v7.3 compiles to the same bytes as with dtc 1.7.0;
+see [`docs/corpus.md`](docs/corpus.md).
+
+Constructs that dtc accepts and gdtc does not yet implement (labels on
+properties, values and reservations, `/incbin/`, and `/plugin/`) are reported
+as `unsupported: <feature>` rather than misparsed. `--report-unsupported`
+lists every such feature in a file instead of stopping at the first; the
+corpus harness uses it to rank the missing features. Decompilation, `-@`
+symbols, overlays, other output formats, and dtc's warnings remain to be
+implemented.
 The compatibility gates and planned order are recorded in
 [`docs/verification.md`](docs/verification.md).
 
@@ -65,6 +80,13 @@ The conformance harness requires both `goose` and upstream `dtc`:
 make test
 ```
 
+`make corpus` runs the Linux corpus (it clones about 100 MB of a pinned
+kernel release once, into `build/corpus`):
+
+```sh
+make corpus
+```
+
 Without Goose installed, the upstream fixture contract can still be checked:
 
 ```sh
@@ -86,10 +108,14 @@ while growing it does not invalidate them. The current CLI uses one
 process-lifetime pool; a later batch mode will move that pool into a per-document
 scope to measure constant-time reclamation directly.
 
-Forward label/path references are kept in a second packed, variable-size fixup
-array whose typed references point into the growing AST pool. A final resolution
-pass validates explicit phandles, discards fixups from overwritten tree data,
-and patches only the properties that survive merging and deletion.
+Merging follows dtc's livetree: an incoming property replaces a colliding one
+by being spliced into its list position, and deleted entries stay linked but
+marked, so a later definition revives them in place. References inside
+property values are fixed-size markers that point back into the source text;
+the fixup pass walks the final tree in order, so phandles are allocated in
+exactly dtc's order. Labels and phandles are indexed by open-addressing tables
+that grow by rebuilding behind themselves in grow-only arrays, so no reference
+into them is ever invalidated.
 
 This deliberately exercises Goose's unusual strengths rather than copying the
 allocation structure of the C implementation.

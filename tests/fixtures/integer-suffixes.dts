@@ -1,0 +1,8 @@
+/dts-v1/;
+
+/memreserve/ 0x1000UL 0x100ULL;
+
+/ {
+    suffixes = <0x10UL 5U 7ULL 8L 9LL 0X1fU>;
+    wide = /bits/ 64 <0xffffffffffffffffULL>;
+};
