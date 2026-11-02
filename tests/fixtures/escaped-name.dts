@@ -1,0 +1,10 @@
+/dts-v1/;
+
+/* A leading backslash escapes a property or node name and is not part of it. */
+/ {
+    \#escaped-cells = <1>;
+
+    \node {
+        \value = <2>;
+    };
+};

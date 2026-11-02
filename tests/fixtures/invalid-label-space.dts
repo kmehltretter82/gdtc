@@ -1,0 +1,7 @@
+/dts-v1/;
+
+/* A label is one token: no space before the colon. */
+/ {
+    label : node {
+    };
+};

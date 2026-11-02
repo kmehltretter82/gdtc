@@ -1,0 +1,11 @@
+/dts-v1/;
+
+/*
+ * Inside a first definition, /delete-node/ leaves a deleted sibling of the
+ * same name behind, which dtc reports as a duplicate node name.
+ */
+/ {
+    node {
+    };
+    /delete-node/ node;
+};

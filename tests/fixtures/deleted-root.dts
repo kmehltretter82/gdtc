@@ -1,0 +1,16 @@
+/dts-v1/;
+
+/*
+ * Deleting the root leaves dtc with nothing to flatten: the structure block
+ * holds only FDT_END. References inside the deleted tree are never resolved.
+ */
+/memreserve/ 0x1000 0x10;
+
+/ {
+    ref = <&missing>;
+
+    child {
+    };
+};
+
+/delete-node/ &{/};

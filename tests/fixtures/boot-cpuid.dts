@@ -1,0 +1,25 @@
+/dts-v1/;
+
+/*
+ * dtc fills the header's boot_cpuid_phys field from the "reg" of the first
+ * child of /cpus, when that is a single cell.
+ */
+/ {
+    #address-cells = <1>;
+    #size-cells = <0>;
+
+    cpus {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        cpu@100 {
+            device_type = "cpu";
+            reg = <0x100>;
+        };
+
+        cpu@101 {
+            device_type = "cpu";
+            reg = <0x101>;
+        };
+    };
+};

@@ -1,0 +1,15 @@
+/dts-v1/;
+
+/*
+ * A phandle property that refers to its own node asks for a phandle to be
+ * allocated for that node.
+ */
+/ {
+    self: self {
+        phandle = <&self>;
+    };
+
+    other {
+        ref = <&self>;
+    };
+};

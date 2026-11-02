@@ -1,0 +1,22 @@
+/dts-v1/;
+
+/*
+ * /delete-property/ only deletes when its node is merged into an existing
+ * one. Inside a node's first definition it is inert.
+ */
+/ {
+    kept = <1>;
+    /delete-property/ kept;
+
+    child {
+        also-kept = <2>;
+        /delete-property/ also-kept;
+    };
+};
+
+/ {
+    child {
+        removed = <3>;
+        /delete-property/ removed;
+    };
+};

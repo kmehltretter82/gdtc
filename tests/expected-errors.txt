@@ -1,0 +1,38 @@
+# Diagnostics expected from gdtc for each fixture that upstream dtc rejects.
+# Format: fixture name, a tab, and a substring of gdtc's error message.
+# tests/run.sh fails if an invalid-* fixture has no entry here.
+invalid-bits-character-width	syntax error
+invalid-byte-array	syntax error
+invalid-cell-expression	syntax error
+invalid-cell-negation	syntax error
+invalid-cell-width	Array elements must be 8, 16, 32 or 64-bits
+invalid-delete-target	Label or path missing not found
+invalid-division-by-zero	Division by zero
+invalid-duplicate-label	Duplicate label 'same'
+invalid-duplicate-node	Duplicate node name
+invalid-duplicate-phandle	duplicated phandle 1
+invalid-duplicate-property	Duplicate property name value
+invalid-first-definition-delete-node	Duplicate node name
+invalid-integer-overflow	Integer literal '0x10000000000000000' out of range
+invalid-label-characters	syntax error
+invalid-label-space	syntax error
+invalid-line-comment-at-eof	syntax error
+invalid-merge-target	Label or path missing not found
+invalid-mismatched-phandle	mismatching 'phandle' and 'linux,phandle' properties
+invalid-multiple-unit-separators	multiple '@' characters in node name
+invalid-name-characters	syntax error
+invalid-name-property	"name" property is incorrect
+invalid-node-name-character	Bad character '#' in node name
+invalid-node-name-slash	syntax error
+invalid-path-reference	Reference to non-existent node or label "/missing"
+invalid-phandle-length	bad length (5) phandle property
+invalid-phandle-value	bad value (0) in phandle property
+invalid-property-name-character	Bad character '@' in property name
+invalid-property-order	Properties must precede subnodes
+invalid-string-continuation	syntax error
+invalid-undefined-label	Reference to non-existent node or label "missing"
+invalid-unterminated-comment	syntax error
+generated-invalid-deep-nesting	memory exhausted
+generated-invalid-deep-parens	memory exhausted
+generated-invalid-paren-depth	memory exhausted
+generated-invalid-stack-depth	memory exhausted

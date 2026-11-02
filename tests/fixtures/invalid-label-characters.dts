@@ -1,0 +1,6 @@
+/dts-v1/;
+
+/ {
+    bad-label: node {
+    };
+};

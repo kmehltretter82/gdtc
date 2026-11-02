@@ -1,0 +1,6 @@
+/dts-v1/;
+
+/* Cells take only primary expressions; operators need parentheses. */
+/ {
+    value = <1 + 2>;
+};
