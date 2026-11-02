@@ -1563,7 +1563,7 @@ fn get_node_by_ref(tree: Item.Node&, ref: const u8[:], at: i64) -> Item.Node? {
     var slash = -1;
     for k in ref.len { if slash < 0 && ref[k] == '/' { slash = k; } }
     if slash < 0 { return get_node_by_label(tree, ref); }
-    unsupported(at, "label-relative-path");
+    // A label-relative path, &{label/path}: the path starts at the label.
     let base = get_node_by_label(tree, ref[..slash]);
     guard base else { return null; }
     return get_node_by_path(base, ref[slash + 1..]);

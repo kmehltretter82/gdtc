@@ -1,0 +1,9 @@
+/dts-v1/;
+
+/ {
+    uart_pins: uart {
+    };
+};
+
+&{uart_pins/missing} {
+};
