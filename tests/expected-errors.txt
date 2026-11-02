@@ -38,3 +38,4 @@ generated-invalid-paren-depth	memory exhausted
 generated-invalid-stack-depth	memory exhausted
 invalid-line-marker-location	board.dts:41: syntax error
 invalid-line-marker-nul	nul in line number directive
+invalid-path-reference-value	Reference to non-existent node or label "missing"

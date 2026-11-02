@@ -1171,7 +1171,6 @@ fn propdata() -> u8[>..] {
             }
         }
         else if kind() == T_LABEL_REF || kind() == T_PATH_REF {
-            unsupported(tp, "path-reference");
             add_marker(M_PATH, value.len, token_text(tp), tp);
             shift();
             shrink(1);
@@ -2201,6 +2200,81 @@ recursive fn fixup_phandle_references(tree: Item.Node&, node: Item.Node&) {
     }
 }
 
+// fixup_path_references: a reference outside a cell list becomes the
+// target's full path. A property value cannot grow in place, so the
+// expanded value goes into a new property that takes the old one's place.
+fn has_path_markers(p: Item.Property&) -> bool {
+    let first: i64 = p.marker_first;
+    let count: i64 = p.marker_count;
+    for m in first..first + count { if markers[m].kind == M_PATH { return true; } }
+    return false;
+}
+
+fn expanded_value(tree: Item.Node&, p: Item.Property&) -> u8[>..] {
+    var value: u8[>..] = [];
+    var cursor = 0;
+    let first: i64 = p.marker_first;
+    let count: i64 = p.marker_count;
+    for m in first..first + count {
+        if markers[m].kind != M_PATH { continue; }
+        let target = get_node_by_ref(tree, markers[m].ref, markers[m].token);
+        guard target else {
+            fail_at(markers[m].token,
+                str("Reference to non-existent node or label \"", markers[m].ref, "\""));
+        }
+        let offset: i64 = markers[m].offset;
+        value.append(p.value[cursor..offset]);
+        append_path(value, target);
+        value.push(0);
+        cursor = offset;
+        target.referenced = true;
+    }
+    value.append(p.value[cursor..]);
+    return value;
+}
+
+fn expanded_property(tree: Item.Node&, p: Item.Property&) -> Item..& {
+    let built .= items.push(Item.Property {
+        next: p.next,
+        labels: p.labels,
+        marker_first: p.marker_first,
+        marker_count: p.marker_count,
+        token: p.token,
+        deleted: false,
+        name: p.name[..],
+        value: expanded_value(tree, p),
+    });
+    let replacement = property_of(built);
+    var i = p.labels;
+    while i >= 0 {
+        labels[i].prop .= replacement;
+        i = labels[i].next_owner;
+    }
+    return built;
+}
+
+recursive fn fixup_path_references(tree: Item.Node&, node: Item.Node&) {
+    var previous: Item..? = null;
+    var pe: Item..? = node.props;
+    while pe {
+        let p = property_of(pe);
+        if !p.deleted && has_path_markers(p) {
+            let replacement .= expanded_property(tree, p);
+            if previous { set_next(previous, replacement); }
+            else { node.props .= replacement; }
+            pe .= replacement;
+        }
+        previous .= pe;
+        pe .= next_of(pe);
+    }
+    var entry: Item..? = node.children;
+    while entry {
+        let child = node_of(entry);
+        if !child.deleted { fixup_path_references(tree, child); }
+        entry .= child.next;
+    }
+}
+
 fn check_tree(tree: Item.Node&) {
     check_names(tree);
     check_name_chars(tree);
@@ -2210,6 +2284,7 @@ fn check_tree(tree: Item.Node&) {
     check_duplicate_labels(tree);
     check_explicit_phandles(tree, tree);
     fixup_phandle_references(tree, tree);
+    fixup_path_references(tree, tree);
 }
 
 // ---------------------------------------------------------------------------
